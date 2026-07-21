@@ -1,7 +1,9 @@
 const express = require("express");
 const pool = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
+app.use(express.json());
 const PORT = 5000;
 
 // Test Database Connection
@@ -17,6 +19,7 @@ pool.connect()
     app.get("/",(req, res) => {
         res.send("Welcome to the Insurance Management API");
     });
+    app.use("/api/auth", authRoutes);
 
     // Start Server
     app.listen(PORT,()=>{

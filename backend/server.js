@@ -1,6 +1,8 @@
 const express = require("express");
 const pool = require("./config/db");
+
 const authRoutes = require("./routes/authRoutes");
+const customerRoutes = require("./routes/customerRoutes");
 
 const app = express();
 app.use(express.json());
@@ -19,7 +21,9 @@ pool.connect()
     app.get("/",(req, res) => {
         res.send("Welcome to the Insurance Management API");
     });
+    
     app.use("/api/auth", authRoutes);
+    app.use("/api/customers", customerRoutes);
 
     // Start Server
     app.listen(PORT,()=>{

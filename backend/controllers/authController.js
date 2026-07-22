@@ -106,7 +106,7 @@ const loginUser = async (req, res) =>{
             message: "Login Successful",
             token,
             user: {
-                id: user.uer_id,
+                id: user.id,//changes in user_id to id
                 full_name: user.full_name,
                 email: user.email,
                 phone: user.phone,

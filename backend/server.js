@@ -1,11 +1,16 @@
 const express = require("express");
+const cors = require("cors");
 const pool = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const customerRoutes = require("./routes/customerRoutes");
+const policyRoutes = require("./routes/policyRoutes");
 
 const app = express();
+
+app.use(cors());
 app.use(express.json());
+
 const PORT = 5000;
 
 // Test Database Connection
@@ -24,6 +29,7 @@ pool.connect()
     
     app.use("/api/auth", authRoutes);
     app.use("/api/customers", customerRoutes);
+    app.use("/api/policies", policyRoutes);
 
     // Start Server
     app.listen(PORT,()=>{

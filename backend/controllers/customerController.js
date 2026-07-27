@@ -58,14 +58,18 @@ const updateCustomerDetails = async (req, res) => {
 
         const {
             full_name,
+            email,
             phone,
+            date_of_birth,
             address,
         } = req.body;
 
         const customer = await updateCustomer(
             id,
             full_name,
+            email,
             phone,
+            date_of_birth,
             address
         );
 

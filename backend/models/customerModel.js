@@ -42,29 +42,28 @@ const getCustomerById = async (id) => {
 const updateCustomer = async(
     id,
     full_name,
+    email,
     phone,
+    date_of_birth,
     address
 ) => {
     const query = `
         UPDATE users
         SET 
             full_name = $1,
-            phone = $2,
-            address = $3
-        WHERE id = $4
-        RETURNING
-            id,
-            full_name,
-            email,
-            phone,
-            date_of_birth,
-            address,
-            created_at;
+            email = $2,
+            phone = $3,
+            date_of_birth = $4,
+            address = $5
+        WHERE id = $6
+        RETURNING *
     `;
 
     const values = [
         full_name,
+        email,
         phone,
+        date_of_birth,
         address,
         id,
     ];

@@ -6,6 +6,8 @@ const authRoutes = require("./routes/authRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const policyRoutes = require("./routes/policyRoutes");
 
+const userPolicyRoutes = require("./routes/userPolicyRoutes");
+
 const app = express();
 
 app.use(cors());
@@ -30,6 +32,7 @@ pool.connect()
     app.use("/api/auth", authRoutes);
     app.use("/api/customers", customerRoutes);
     app.use("/api/policies", policyRoutes);
+    app.use("/api/user-policies", userPolicyRoutes);
 
     // Start Server
     app.listen(PORT,()=>{

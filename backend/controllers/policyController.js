@@ -43,19 +43,54 @@ const createNewPolicy = async (req, res) => {
 };
 
 // Get all policies
+// Get all policies
 const getPolicies = async (req, res) => {
     try {
-        const policies = await getAllPolicies();
+        const search = req.query.search || "";
+        const status = req.query.status || "";
+
+        const page = Math.max(
+            parseInt(req.query.page, 10) || 1,
+            1
+        );
+
+        const limit = Math.max(
+            parseInt(req.query.limit, 10) || 5,
+            1
+        );
+
+        const {
+            policies,
+            totalRecords,
+        } = await getAllPolicies({
+            search,
+            status,
+            page,
+            limit,
+        });
 
         res.status(200).json({
             message: "Policies fetched successfully",
-            policies,
+            data: policies,
+
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(
+                    totalRecords / limit
+                ),
+                totalRecords,
+                limit,
+            },
         });
     } catch (error) {
-        console.error(error);
+        console.error(
+            "Error fetching policies:",
+            error
+        );
 
         res.status(500).json({
-            message: "Internal Server Error",
+            message: "Failed to fetch policies",
+            error: error.message,
         });
     }
 };

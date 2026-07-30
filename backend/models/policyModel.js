@@ -48,24 +48,66 @@ const createPolicy = async (
 };
 
 // Get all policies
-const getAllPolicies = async () => {
-    const query = `
-        SELECT 
-            policy_id,
-            policy_name,
-            policy_type,
-            premium_amount,
-            coverage_amount,
-            duration_months,
-            description,
-            status
-        FROM policies
-        ORDER BY policy_id;
-    `;
+const getAllPolicies = async ({
+  search = "",
+  status = "",
+  page = 1,
+  limit = 5,
+}) => {
+  const offset = (page - 1) * limit;
+  const searchValue = `%${search}%`;
 
-    const result = await pool.query(query);
+  let query = `
+    SELECT *
+    FROM policies
+    WHERE (
+      policy_name ILIKE $1
+      OR policy_type ILIKE $1
+      OR description ILIKE $1
+    )
+  `;
 
-    return result.rows;
+  let countQuery = `
+    SELECT COUNT(*)::INT AS total
+    FROM policies
+    WHERE (
+      policy_name ILIKE $1
+      OR policy_type ILIKE $1
+      OR description ILIKE $1
+    )
+  `;
+
+  const params = [searchValue];
+  const countParams = [searchValue];
+
+  if (status) {
+    query += ` AND status = $2`;
+    countQuery += ` AND status = $2`;
+
+    params.push(status);
+    countParams.push(status);
+  }
+
+  query += `
+    ORDER BY policy_id DESC
+    LIMIT $${params.length + 1}
+    OFFSET $${params.length + 2}
+  `;
+
+  params.push(limit);
+  params.push(offset);
+
+  const policiesResult = await pool.query(query, params);
+
+  const countResult = await pool.query(
+    countQuery,
+    countParams
+  );
+
+  return {
+    policies: policiesResult.rows,
+    totalRecords: countResult.rows[0].total,
+  };
 };
 
 // Get policy by ID

@@ -1,24 +1,46 @@
 const pool = require("../config/db");
 
 // Get all customers
-const getAllCustomers = async () => {
-    const query = `
-        SELECT
-            id,
-            full_name,
-            email,
-            phone,
-            date_of_birth,
-            address,
-            created_at
-        FROM users
-        ORDER BY id;
-    `;
+const getAllCustomers = async ({
+  search = "",
+  page = 1,
+  limit = 5,
+}) => {
+  const offset = (page - 1) * limit;
+  const searchValue = `%${search}%`;
 
-    const result = await pool.query(query);
-    return result.rows;
+  const customersResult = await pool.query(
+    `
+      SELECT *
+      FROM users
+      WHERE
+        full_name ILIKE $1
+        OR email ILIKE $1
+        OR phone ILIKE $1
+      ORDER BY created_at DESC
+      LIMIT $2
+      OFFSET $3
+    `,
+    [searchValue, limit, offset]
+  );
+
+  const countResult = await pool.query(
+    `
+      SELECT COUNT(*)::INT AS total
+      FROM users
+      WHERE
+        full_name ILIKE $1
+        OR email ILIKE $1
+        OR phone ILIKE $1
+    `,
+    [searchValue]
+  );
+
+  return {
+    customers: customersResult.rows,
+    totalRecords: countResult.rows[0].total,
+  };
 };
-
 // Get customer by ID
 const getCustomerById = async (id) => {
     const query = `

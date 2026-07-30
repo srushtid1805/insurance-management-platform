@@ -2,14 +2,27 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/policies";
 
-export const getPolicies = async () => {
-    try {
-        const response = await axios.get(API_URL);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching policies:", error);
-        throw error;
-    }
+export const getPolicies = async (
+  search = "",
+  status = "",
+  page = 1,
+  limit = 5
+) => {
+  try {
+    const response = await axios.get(API_URL, {
+      params: {
+        search,
+        status,
+        page,
+        limit,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching policies:", error);
+    throw error;
+  }
 };
 
 export const getPolicyById = async (id) => {

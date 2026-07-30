@@ -49,18 +49,47 @@ const assignPolicyToUser = async (req, res) => {
 };
 
 const fetchAllUserPolicies = async (req, res) => {
-    try {
-        const userPolicies = await getAllUserPolicies();
+     try {
+        const search = req.query.search || "";
+        const status = req.query.status || "";
 
-        return res.status(200).json({
-            count: userPolicies.length,
+        const page = Math.max(
+            parseInt(req.query.page, 10) || 1,
+            1
+        );
+
+        const limit = Math.max(
+            parseInt(req.query.limit, 10) || 5,
+            1
+        );
+
+        const {
             userPolicies,
+            totalRecords,
+        } = await getAllUserPolicies({
+            search,
+            status,
+            page,
+            limit,
+        });
+
+        res.status(200).json({
+            message: "User policies fetched successfully",
+            data: userPolicies,
+
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalRecords / limit),
+                totalRecords,
+                limit,
+            },
         });
     } catch (error) {
-        console.error("Fetch user policies error:", error);
+        console.error("Error fetching user policies:", error);
 
-        return res.status(500).json({
+        res.status(500).json({
             message: "Failed to fetch user policies",
+            error: error.message,
         });
     }
 };

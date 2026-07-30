@@ -4,7 +4,8 @@ function PolicyForm({
   onAddPolicy,
   onUpdatePolicy,
   selectedPolicy,
-  isEditing
+  isEditing,
+  onCancelEdit
 }) {
   const initialFormData = {
     policy_name: "",
@@ -40,24 +41,21 @@ function PolicyForm({
     }
   }, [selectedPolicy]);
 
-  
+  useEffect(() => {
+    if (!isEditing) {
+      setFormData(initialFormData);
+    }
+  }, [isEditing]);
+
   const handleChange = (event) => {
-      setFormData({
-          ...formData,
-          [event.target.name]: event.target.value
-        });
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value
+    });
   };
 
   const resetForm = () => {
-      setFormData({
-        policy_name: "",
-        policy_type: "",
-        premium_amount: "",
-        coverage_amount: "",
-        duration_months: "",
-        description: "",
-        status: "Active"
-      });
+    setFormData(initialFormData);
   };
 
   const handleSubmit = async (event) => {
@@ -83,7 +81,7 @@ function PolicyForm({
       <input
         type="text"
         name="policy_name"
-        placeholder="Policy Name"
+        placeholder="e.g. Health, Vehicle, Life"
         value={formData.policy_name}
         onChange={handleChange}
         required
@@ -130,7 +128,7 @@ function PolicyForm({
 
       <textarea
         name="description"
-        placeholder="Policy Description"
+        placeholder="Enter policy description..."
         value={formData.description}
         onChange={handleChange}
         rows="3"
@@ -147,9 +145,23 @@ function PolicyForm({
         <option value="Inactive">Inactive</option>
       </select>
 
-      <button type="submit">
-        {isEditing ? "Update Policy" : "Save Policy"}
-      </button>
+      <div>
+        <button type="submit">
+          {isEditing ? "Update Policy" : "Save Policy"}
+        </button>
+
+        {isEditing && (
+          <button
+            type="button"
+            onClick={() => {
+              resetForm();
+              onCancelEdit();
+            }}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 }

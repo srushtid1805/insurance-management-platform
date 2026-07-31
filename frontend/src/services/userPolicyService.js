@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from "./api";
 
-const API_URL = "http://localhost:5000/api/user-policies";
+const USER_POLICY_URL = "/user-policies";
 
 // Get all assigned policies
 export const getUserPolicies = async (
@@ -10,7 +10,7 @@ export const getUserPolicies = async (
   limit = 5
 ) => {
   try {
-    const response = await axios.get(API_URL, {
+    const response = await api.get(USER_POLICY_URL, {
       params: {
         search,
         status,
@@ -28,18 +28,47 @@ export const getUserPolicies = async (
 
 // Assign policy to user
 export const assignUserPolicy = async (userPolicyData) => {
-  const response = await axios.post(API_URL, userPolicyData);
-  return response.data;
+  try {
+    const response = await api.post(
+      USER_POLICY_URL,
+      userPolicyData
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error assigning user policy:", error);
+    throw error;
+  }
 };
 
 // Update assigned policy
-export const updateUserPolicy = async (id, userPolicyData) => {
-  const response = await axios.put(`${API_URL}/${id}`, userPolicyData);
-  return response.data;
+export const updateUserPolicy = async (
+  id,
+  userPolicyData
+) => {
+  try {
+    const response = await api.put(
+      `${USER_POLICY_URL}/${id}`,
+      userPolicyData
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user policy:", error);
+    throw error;
+  }
 };
 
 // Delete assigned policy
 export const deleteUserPolicy = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`);
-  return response.data;
+  try {
+    const response = await api.delete(
+      `${USER_POLICY_URL}/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user policy:", error);
+    throw error;
+  }
 };

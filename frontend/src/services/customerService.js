@@ -1,6 +1,8 @@
+import api from "./api";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/customers";
+const CUSTOMER_URL = "/customers";
+const AUTH_URL = "http://localhost:5000/api/auth";
 
 export const getCustomers = async (
   search = "",
@@ -8,7 +10,7 @@ export const getCustomers = async (
   limit = 5
 ) => {
   try {
-    const response = await axios.get(API_URL, {
+    const response = await api.get(CUSTOMER_URL, {
       params: {
         search,
         page,
@@ -23,40 +25,46 @@ export const getCustomers = async (
   }
 };
 
-export const deleteCustomer = async (id) =>{
-    try{
-        const response = await axios.delete(`${API_URL}/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error deleting customer:", error);
-        throw error;
-    }
+export const deleteCustomer = async (id) => {
+  try {
+    const response = await api.delete(
+      `${CUSTOMER_URL}/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting customer:", error);
+    throw error;
+  }
 };
 
-export const addCustomer = async (customerData) =>{
-    try{
-        const response = await axios.post(
-            "http://localhost:5000/api/auth/register",
-            customerData
-        );
+export const addCustomer = async (customerData) => {
+  try {
+    const response = await axios.post(
+      `${AUTH_URL}/register`,
+      customerData
+    );
 
-        return response.data;
-    } catch (error){
-        console.error("Error adding customer:", error);
-        throw error;
-    }
+    return response.data;
+  } catch (error) {
+    console.error("Error adding customer:", error);
+    throw error;
+  }
 };
 
-export const updateCustomer = async (id, customerData) => {
-    try {
-        const response = await axios.put(
-            `${API_URL}/${id}`,
-            customerData
-        );
+export const updateCustomer = async (
+  id,
+  customerData
+) => {
+  try {
+    const response = await api.put(
+      `${CUSTOMER_URL}/${id}`,
+      customerData
+    );
 
-        return response.data;
-    } catch (error) {
-        console.error("Error updating customer:", error);
-        throw error;
-    }
+    return response.data;
+  } catch (error) {
+    console.error("Error updating customer:", error);
+    throw error;
+  }
 };

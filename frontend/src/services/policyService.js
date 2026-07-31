@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from "./api";
 
-const API_URL = "http://localhost:5000/api/policies";
+const POLICY_URL = "/policies";
 
 export const getPolicies = async (
   search = "",
@@ -9,7 +9,7 @@ export const getPolicies = async (
   limit = 5
 ) => {
   try {
-    const response = await axios.get(API_URL, {
+    const response = await api.get(POLICY_URL, {
       params: {
         search,
         status,
@@ -26,45 +26,55 @@ export const getPolicies = async (
 };
 
 export const getPolicyById = async (id) => {
-    try {
-        const response = await axios.get(`${API_URL}/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching policy:", error);
-        throw error;
-    }
+  try {
+    const response = await api.get(`${POLICY_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching policy:", error);
+    throw error;
+  }
 };
 
 export const addPolicy = async (policyData) => {
-    try {
-        const response = await axios.post(API_URL, policyData);
-        return response.data;
-    } catch (error) {
-        console.error("Error adding policy:", error);
-        throw error;
-    }
+  try {
+    const response = await api.post(
+      POLICY_URL,
+      policyData
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error adding policy:", error);
+    throw error;
+  }
 };
 
-export const updatePolicy = async (id, policyData) => {
-    try {
-        const response = await axios.put(
-            `${API_URL}/${id}`,
-            policyData
-        );
+export const updatePolicy = async (
+  id,
+  policyData
+) => {
+  try {
+    const response = await api.put(
+      `${POLICY_URL}/${id}`,
+      policyData
+    );
 
-        return response.data;
-    } catch (error) {
-        console.error("Error updating policy:", error);
-        throw error;
-    }
+    return response.data;
+  } catch (error) {
+    console.error("Error updating policy:", error);
+    throw error;
+  }
 };
 
 export const deletePolicy = async (id) => {
-    try {
-        const response = await axios.delete(`${API_URL}/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error deleting policy:", error);
-        throw error;
-    }
+  try {
+    const response = await api.delete(
+      `${POLICY_URL}/${id}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting policy:", error);
+    throw error;
+  }
 };

@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:5000/api/reports";
+import api from "./api";
 
 export const getDashboardSummary = async () => {
   try {
-    const response = await axios.get(`${API_URL}/summary`);
+    const response = await api.get("/reports/summary");
     return response.data;
   } catch (error) {
     console.error("Error fetching dashboard summary:", error);
@@ -14,8 +12,8 @@ export const getDashboardSummary = async () => {
 
 export const getClaimStatistics = async () => {
   try {
-    const response = await axios.get(
-      `${API_URL}/claim-statistics`
+    const response = await api.get(
+      "/reports/claim-statistics"
     );
 
     return response.data;
@@ -27,8 +25,8 @@ export const getClaimStatistics = async () => {
 
 export const getPremiumCollection = async () => {
   try {
-    const response = await axios.get(
-      `${API_URL}/premium-collection`
+    const response = await api.get(
+      "/reports/premium-collection"
     );
 
     return response.data;
@@ -40,8 +38,8 @@ export const getPremiumCollection = async () => {
 
 export const getCustomerGrowth = async () => {
   try {
-    const response = await axios.get(
-      `${API_URL}/customer-growth`
+    const response = await api.get(
+      "/reports/customer-growth"
     );
 
     return response.data;
@@ -53,8 +51,8 @@ export const getCustomerGrowth = async () => {
 
 export const getMonthlyBusinessOverview = async () => {
   try {
-    const response = await axios.get(
-      `${API_URL}/monthly-business`
+    const response = await api.get(
+      "/reports/monthly-business"
     );
 
     return response.data;

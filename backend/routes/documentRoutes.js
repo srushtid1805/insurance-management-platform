@@ -11,19 +11,45 @@ const {
   deleteDocumentDetails,
 } = require("../controllers/documentController");
 
+const {
+  protect,
+  authorizeRoles,
+} = require("../middleware/authMiddleware");
+
 // Upload Document
-router.post("/", upload.single("document"), addDocument);
+router.post(
+  "/", upload.single("document"),
+  protect,
+  authorizeRoles("admin", "agent"),
+  addDocument);
 
 // Get All Documents
-router.get("/", getDocuments);
+router.get(
+  "/", 
+  protect,
+  authorizeRoles("admin", "agent"),
+  getDocuments);
 
 // Get Document By ID
-router.get("/:id", getDocument);
+router.get(
+  "/:id", 
+  protect,
+  authorizeRoles("admin", "agent"),
+  getDocument);
 
 // Update Document
-router.put("/:id", upload.single("document"), updateDocumentDetails);
+router.put(
+  "/:id", 
+  upload.single("document"), 
+  protect,
+  authorizeRoles("admin", "agent"),
+  updateDocumentDetails);
 
 // Delete Document
-router.delete("/:id", deleteDocumentDetails);
+router.delete(
+  "/:id", 
+  protect,
+  authorizeRoles("admin"),
+  deleteDocumentDetails);
 
 module.exports = router;

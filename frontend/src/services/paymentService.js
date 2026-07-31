@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from "./api";
 
-const API_URL = "http://localhost:5000/api/payments";
+const PAYMENT_URL = "/payments";
 
 // Get all payments
 export const getAllPayments = async (
@@ -9,39 +9,66 @@ export const getAllPayments = async (
   page = 1,
   limit = 5
 ) => {
-  const response = await axios.get(API_URL, {
-    params: {
-      search,
-      status,
-      page,
-      limit,
-    },
-  });
+  try {
+    const response = await api.get(PAYMENT_URL, {
+      params: {
+        search,
+        status,
+        page,
+        limit,
+      },
+    });
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    throw error;
+  }
 };
 
 // Create payment
 export const createPayment = async (paymentData) => {
-  const response = await axios.post(API_URL, paymentData);
-  return response.data.payment;
+  try {
+    const response = await api.post(
+      PAYMENT_URL,
+      paymentData
+    );
+
+    return response.data.payment;
+  } catch (error) {
+    console.error("Error creating payment:", error);
+    throw error;
+  }
 };
 
 // Update payment
-export const updatePayment = async (paymentId, paymentData) => {
-  const response = await axios.put(
-    `${API_URL}/${paymentId}`,
-    paymentData
-  );
+export const updatePayment = async (
+  paymentId,
+  paymentData
+) => {
+  try {
+    const response = await api.put(
+      `${PAYMENT_URL}/${paymentId}`,
+      paymentData
+    );
 
-  return response.data.payment;
+    return response.data.payment;
+  } catch (error) {
+    console.error("Error updating payment:", error);
+    throw error;
+  }
 };
 
 // Delete payment
 export const deletePayment = async (paymentId) => {
-  const response = await axios.delete(
-    `${API_URL}/${paymentId}`
-  );
+  try {
+    const response = await api.delete(
+      `${PAYMENT_URL}/${paymentId}`
+    );
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting payment:", error);
+    throw error;
+  }
 };

@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from "./api";
 
-const API_URL = "http://localhost:5000/api/documents";
+const DOCUMENT_URL = "/documents";
 
 // Get all documents
 export const getAllDocuments = async (
@@ -9,46 +9,76 @@ export const getAllDocuments = async (
   page = 1,
   limit = 5
 ) => {
-  const response = await axios.get(API_URL, {
-    params: {
-      search,
-      status,
-      page,
-      limit,
-    },
-  });
+  try {
+    const response = await api.get(DOCUMENT_URL, {
+      params: {
+        search,
+        status,
+        page,
+        limit,
+      },
+    });
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    throw error;
+  }
 };
 
 // Upload a new document
 export const createDocument = async (formData) => {
-  const response = await axios.post(API_URL, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  try {
+    const response = await api.post(
+      DOCUMENT_URL,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Error creating document:", error);
+    throw error;
+  }
 };
 
-// Update document details or verification status
-export const updateDocument = async (documentId, formData) => {
-  const response = await axios.put(
-    `${API_URL}/${documentId}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+// Update document
+export const updateDocument = async (
+  documentId,
+  formData
+) => {
+  try {
+    const response = await api.put(
+      `${DOCUMENT_URL}/${documentId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    console.error("Error updating document:", error);
+    throw error;
+  }
 };
 
 // Delete document
 export const deleteDocument = async (documentId) => {
-  const response = await axios.delete(`${API_URL}/${documentId}`);
-  return response.data;
+  try {
+    const response = await api.delete(
+      `${DOCUMENT_URL}/${documentId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting document:", error);
+    throw error;
+  }
 };

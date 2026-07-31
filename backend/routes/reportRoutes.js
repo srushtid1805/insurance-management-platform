@@ -9,17 +9,40 @@ const {
   fetchMonthlyBusinessOverview,
 } = require("../controllers/reportController");
 
+const {
+  protect,
+  authorizeRoles,
+} = require("../middleware/authMiddleware");
+
 // Dashboard Summary
-router.get("/summary", fetchDashboardSummary);
+router.get(
+  "/summary", 
+  protect,
+  authorizeRoles("admin"),
+  fetchDashboardSummary);
 
-router.get("/claim-statistics", fetchClaimStatistics);
+router.get(
+  "/claim-statistics",
+  protect,
+  authorizeRoles("admin"),
+  fetchClaimStatistics);
 
-router.get("/premium-collection", fetchPremiumCollection);
+router.get(
+  "/premium-collection", 
+  protect,
+  authorizeRoles("admin"),
+  fetchPremiumCollection);
 
-router.get("/customer-growth", fetchCustomerGrowth);
+router.get(
+  "/customer-growth", 
+  protect,
+  authorizeRoles("admin"),
+  fetchCustomerGrowth);
 
 router.get(
   "/monthly-business",
+  protect,
+  authorizeRoles("admin"),
   fetchMonthlyBusinessOverview
 );
 

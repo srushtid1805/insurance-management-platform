@@ -41,6 +41,27 @@ pool.connect()
         res.send("Welcome to the Insurance Management API");
     });
     app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+    app.get("/api/db-test", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        current_database() AS database_name,
+        current_schema() AS schema_name,
+        current_user AS database_user,
+        to_regclass('public.users') AS users_table;
+    `);
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Database test failed:", error);
+
+    res.status(500).json({
+      message: "Database test failed",
+      error: error.message
+    });
+  }
+});
     
     app.use("/api/auth", authRoutes);
     app.use("/api/customers", customerRoutes);

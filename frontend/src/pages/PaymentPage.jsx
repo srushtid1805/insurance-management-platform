@@ -1,4 +1,4 @@
-import "./PaymentPage.css";
+import "./PaymentPageNew.css";
 
 import {
   FaSearch,

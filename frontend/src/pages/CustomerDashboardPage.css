@@ -1,0 +1,197 @@
+.customer-dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.customer-dashboard-eyebrow,
+.customer-dashboard-section-eyebrow {
+  margin: 0;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.customer-dashboard-header h1 {
+  margin: 6px 0;
+  color: #1f2937;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 700;
+}
+
+.customer-dashboard-subtitle {
+  margin: 0;
+  color: #6b7280;
+}
+
+.customer-profile-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.customer-profile-icon {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 26px;
+}
+
+.customer-profile-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.customer-profile-details h2 {
+  margin: 0 0 14px;
+  color: #1f2937;
+  font-size: 24px;
+}
+
+.customer-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 240px), 1fr)
+  );
+  gap: 10px 20px;
+}
+
+.customer-profile-grid p {
+  margin: 0;
+  color: #475569;
+  overflow-wrap: anywhere;
+}
+
+.customer-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 220px), 1fr)
+  );
+  gap: 20px;
+}
+
+.customer-dashboard-section-card {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.customer-dashboard-section-header {
+  margin-bottom: 20px;
+}
+
+.customer-dashboard-section-header h2 {
+  margin: 6px 0 0;
+  color: #1f2937;
+  font-size: 24px;
+}
+
+.next-premium-card {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 180px), 1fr)
+  );
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #eff6ff;
+}
+
+.next-premium-card h3,
+.next-premium-card strong {
+  margin: 4px 0 0;
+  color: #1e3a8a;
+}
+
+.next-premium-label {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.customer-policy-table {
+  min-width: 950px;
+  margin: 0;
+}
+
+.customer-policy-table thead th {
+  padding: 14px 16px;
+  background: #f8fafc;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.customer-policy-table tbody td {
+  padding: 15px 16px;
+  color: #334155;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.customer-policy-status {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.customer-policy-status-active {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.customer-policy-status-expired {
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.customer-policy-status-cancelled {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.customer-dashboard-empty-state {
+  padding: 35px 20px !important;
+  color: #64748b !important;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .customer-dashboard-page {
+    gap: 18px;
+  }
+
+  .customer-profile-card {
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .customer-dashboard-section-card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+}

@@ -9,12 +9,22 @@ const {
   removeUserPolicy
 } = require("../controllers/userPolicyController");
 
-const { protect, authorizeRoles } = require("../middleware/authMiddleware");
+const {
+  protect,
+  authorizeRoles
+} = require("../middleware/authMiddleware");
 
-// Assign a policy to a user
-router.post("/", protect, authorizeRoles("admin"), assignPolicyToUser);
+// Admin and agent can assign policies.
+// Agent ownership is checked in the controller.
+router.post(
+  "/",
+  protect,
+  authorizeRoles("admin", "agent"),
+  assignPolicyToUser
+);
 
-// Get all assigned policies
+// Admin sees all assignments.
+// Agent sees only assignments for their customers.
 router.get(
   "/",
   protect,
@@ -22,7 +32,8 @@ router.get(
   fetchAllUserPolicies
 );
 
-// Get one assigned policy
+// Admin can access any assignment.
+// Agent can access only their customers' assignment.
 router.get(
   "/:id",
   protect,
@@ -30,10 +41,20 @@ router.get(
   fetchUserPolicyById
 );
 
-// Update assigned policy
-router.put("/:id", protect, authorizeRoles("admin"), updateUserPolicyDetails);
+// Only admin can update an assignment.
+router.put(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  updateUserPolicyDetails
+);
 
-// Delete assigned policy
-router.delete("/:id", protect, authorizeRoles("admin"), removeUserPolicy);
+// Only admin can delete an assignment.
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("admin"),
+  removeUserPolicy
+);
 
 module.exports = router;

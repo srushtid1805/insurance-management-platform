@@ -7,7 +7,7 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip,
+  Tooltip
 } from "chart.js";
 
 import { Line } from "react-chartjs-2";
@@ -24,7 +24,7 @@ ChartJS.register(
 );
 
 const CustomerGrowthChart = ({
-  customerGrowth = [],
+  customerGrowth = []
 }) => {
   const chartData = {
     labels: customerGrowth.map(
@@ -41,29 +41,46 @@ const CustomerGrowthChart = ({
         backgroundColor: "rgba(124, 58, 237, 0.15)",
         tension: 0.35,
         fill: true,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-      },
-    ],
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: "#7c3aed",
+        pointBorderColor: "#ffffff",
+        pointBorderWidth: 2
+      }
+    ]
   };
+
+  const totalCustomers =
+    chartData.datasets[0].data.reduce(
+      (sum, value) => sum + Number(value),
+      0
+    );
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
 
+    interaction: {
+      mode: "index",
+      intersect: false
+    },
+
     plugins: {
       legend: {
-        display: false,
+        display: false
       },
 
       tooltip: {
         callbacks: {
-          label: (context) =>
-            `${context.raw} customer${
-              context.raw === 1 ? "" : "s"
-            }`,
-        },
-      },
+          label: (context) => {
+            const value = Number(context.raw);
+
+            return `${value} customer${
+              value === 1 ? "" : "s"
+            }`;
+          }
+        }
+      }
     },
 
     scales: {
@@ -72,20 +89,39 @@ const CustomerGrowthChart = ({
 
         ticks: {
           precision: 0,
+          font: {
+            size: 11
+          }
         },
 
         title: {
           display: true,
           text: "Customers",
+          font: {
+            size: 12,
+            weight: "600"
+          }
         },
+
+        grid: {
+          color: "rgba(148, 163, 184, 0.18)"
+        }
       },
 
       x: {
         grid: {
-          display: false,
+          display: false
         },
-      },
-    },
+
+        ticks: {
+          maxRotation: 0,
+          minRotation: 0,
+          font: {
+            size: 11
+          }
+        }
+      }
+    }
   };
 
   return (
@@ -93,10 +129,16 @@ const CustomerGrowthChart = ({
       <h2>Customer Growth</h2>
 
       <div className="chart-wrapper">
-        <Line
-          data={chartData}
-          options={options}
-        />
+        {totalCustomers === 0 ? (
+          <div className="h-100 d-flex align-items-center justify-content-center text-muted">
+            No customer growth data available.
+          </div>
+        ) : (
+          <Line
+            data={chartData}
+            options={options}
+          />
+        )}
       </div>
     </div>
   );

@@ -17,15 +17,6 @@ function PolicyForm({
     status: "Active"
   };
   const [formData, setFormData] = useState(initialFormData);
-  // const [formData, setFormData] = useState({
-  //     policy_name: "",
-  //     policy_type: "",
-  //     premium_amount: "",
-  //     coverage_amount: "",
-  //     duration_months: "",
-  //     description: "",
-  //     status: "Active",
-  // });
 
   useEffect(() => {
     if (selectedPolicy) {
@@ -74,96 +65,197 @@ function PolicyForm({
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h3>{isEditing ? "Edit Policy" : "Add Policy"}</h3>
-
-      <input
-        type="text"
-        name="policy_name"
-        placeholder="e.g. Health, Vehicle, Life"
-        value={formData.policy_name}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        type="text"
-        name="policy_type"
-        placeholder="Policy Type"
-        value={formData.policy_type}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        type="number"
-        name="premium_amount"
-        placeholder="Premium Amount"
-        value={formData.premium_amount}
-        onChange={handleChange}
-        min="0"
-        required
-      />
-
-      <input
-        type="number"
-        name="coverage_amount"
-        placeholder="Coverage Amount"
-        value={formData.coverage_amount}
-        onChange={handleChange}
-        min="0"
-        required
-      />
-
-      <input
-        type="number"
-        name="duration_months"
-        placeholder="Duration in Months"
-        value={formData.duration_months}
-        onChange={handleChange}
-        min="1"
-        required
-      />
-
-      <textarea
-        name="description"
-        placeholder="Enter policy description..."
-        value={formData.description}
-        onChange={handleChange}
-        rows="3"
-        required
-      />
-
-      <select
-        name="status"
-        value={formData.status}
-        onChange={handleChange}
-        required
-      >
-        <option value="Active">Active</option>
-        <option value="Inactive">Inactive</option>
-      </select>
-
+return (
+  <form className="policy-form" onSubmit={handleSubmit}>
+    <div className="policy-form-header">
       <div>
-        <button type="submit">
-          {isEditing ? "Update Policy" : "Save Policy"}
-        </button>
+        <p className="policy-form-eyebrow">
+          {isEditing ? "Update Record" : "New Policy"}
+        </p>
 
-        {isEditing && (
-          <button
-            type="button"
-            onClick={() => {
-              resetForm();
-              onCancelEdit();
-            }}
-          >
-            Cancel
-          </button>
-        )}
+        <h3>
+          {isEditing ? "Edit Policy" : "Add Policy"}
+        </h3>
+
+        <p>
+          {isEditing
+            ? "Update the selected policy details."
+            : "Enter the policy information below to create a new record."}
+        </p>
       </div>
-    </form>
-  );
+    </div>
+
+    <div className="row g-3">
+      <div className="col-12 col-md-6">
+        <label
+          htmlFor="policy_name"
+          className="form-label"
+        >
+          Policy Name
+        </label>
+
+        <input
+          id="policy_name"
+          type="text"
+          name="policy_name"
+          className="form-control"
+          placeholder="Enter policy name"
+          value={formData.policy_name}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="col-12 col-md-6">
+        <label
+          htmlFor="policy_type"
+          className="form-label"
+        >
+          Policy Type
+        </label>
+
+        <input
+          id="policy_type"
+          type="text"
+          name="policy_type"
+          className="form-control"
+          placeholder="e.g. Health, Vehicle, Life"
+          value={formData.policy_type}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="col-12 col-md-6">
+        <label
+          htmlFor="premium_amount"
+          className="form-label"
+        >
+          Premium Amount
+        </label>
+
+        <input
+          id="premium_amount"
+          type="number"
+          name="premium_amount"
+          className="form-control"
+          placeholder="Enter premium amount"
+          value={formData.premium_amount}
+          onChange={handleChange}
+          min="0"
+          step="0.01"
+          required
+        />
+      </div>
+
+      <div className="col-12 col-md-6">
+        <label
+          htmlFor="coverage_amount"
+          className="form-label"
+        >
+          Coverage Amount
+        </label>
+
+        <input
+          id="coverage_amount"
+          type="number"
+          name="coverage_amount"
+          className="form-control"
+          placeholder="Enter coverage amount"
+          value={formData.coverage_amount}
+          onChange={handleChange}
+          min="0"
+          step="0.01"
+          required
+        />
+      </div>
+
+      <div className="col-12 col-md-6">
+        <label
+          htmlFor="duration_months"
+          className="form-label"
+        >
+          Duration
+        </label>
+
+        <input
+          id="duration_months"
+          type="number"
+          name="duration_months"
+          className="form-control"
+          placeholder="Duration in months"
+          value={formData.duration_months}
+          onChange={handleChange}
+          min="1"
+          required
+        />
+      </div>
+
+      <div className="col-12 col-md-6">
+        <label
+          htmlFor="status"
+          className="form-label"
+        >
+          Status
+        </label>
+
+        <select
+          id="status"
+          name="status"
+          className="form-select"
+          value={formData.status}
+          onChange={handleChange}
+          required
+        >
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div className="col-12">
+        <label
+          htmlFor="description"
+          className="form-label"
+        >
+          Description
+        </label>
+
+        <textarea
+          id="description"
+          name="description"
+          className="form-control"
+          placeholder="Enter policy description..."
+          value={formData.description}
+          onChange={handleChange}
+          rows="4"
+          required
+        />
+      </div>
+    </div>
+
+    <div className="policy-form-actions">
+      <button
+        type="submit"
+        className="btn btn-primary"
+      >
+        {isEditing ? "Update Policy" : "Save Policy"}
+      </button>
+
+      {isEditing && (
+        <button
+          type="button"
+          className="btn btn-outline-secondary"
+          onClick={() => {
+            resetForm();
+            onCancelEdit();
+          }}
+        >
+          Cancel
+        </button>
+      )}
+    </div>
+  </form>
+);
 }
 
 export default PolicyForm;

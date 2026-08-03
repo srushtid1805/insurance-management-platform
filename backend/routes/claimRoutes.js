@@ -7,46 +7,61 @@ const {
   getClaim,
   updateClaimDetails,
   deleteClaimDetails,
+  getMyClaims
 } = require("../controllers/claimController");
 
 const {
   protect,
-  authorizeRoles,
+  authorizeRoles
 } = require("../middleware/authMiddleware");
 
-// Create Claim
+// Create claim
 router.post(
-  "/", 
+  "/",
   protect,
   authorizeRoles("admin", "agent"),
-  addClaim);
+  addClaim
+);
 
-// Get All Claims
+// Get all claims for admin and agent
 router.get(
-  "/", 
+  "/",
   protect,
   authorizeRoles("admin", "agent"),
-  getClaims);
+  getClaims
+);
 
-// Get Claim By ID
+// Customer: get only their own claims
+// Keep this before "/:id"
 router.get(
-  "/:id", 
+  "/my-claims",
+  protect,
+  authorizeRoles("customer"),
+  getMyClaims
+);
+
+// Get claim by ID
+router.get(
+  "/:id",
   protect,
   authorizeRoles("admin", "agent"),
-  getClaim);
+  getClaim
+);
 
-// Update Claim
+// Update claim
 router.put(
-  "/:id", 
+  "/:id",
   protect,
   authorizeRoles("admin", "agent"),
-  updateClaimDetails);
+  updateClaimDetails
+);
 
-// Delete Claim
+// Delete claim
 router.delete(
-  "/:id", 
+  "/:id",
   protect,
   authorizeRoles("admin"),
-  deleteClaimDetails);
+  deleteClaimDetails
+);
 
 module.exports = router;

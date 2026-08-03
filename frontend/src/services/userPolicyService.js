@@ -15,8 +15,8 @@ export const getUserPolicies = async (
         search,
         status,
         page,
-        limit,
-      },
+        limit
+      }
     });
 
     return response.data;

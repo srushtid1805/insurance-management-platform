@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 const initialFormData = {
   user_id: "",
   document_type: "",
@@ -64,84 +67,145 @@ const DocumentForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{isEditing ? "Update Document" : "Upload Document"}</h2>
+    <form className="document-form" onSubmit={handleSubmit}>
+      <div className="document-form-header">
+        <p className="document-form-eyebrow">
+          {isEditing ? "Update Record" : "New Document"}
+        </p>
 
-      <select
-        name="user_id"
-        value={formData.user_id}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Select Customer</option>
+        <h3>{isEditing ? "Update Document" : "Upload Document"}</h3>
 
-        {users.map((user) => (
-          <option key={user.id} value={user.id}>
-            {user.full_name || user.fullName}
-          </option>
-        ))}
-      </select>
+        <p>
+          {isEditing
+            ? "Update the selected document details or replace the uploaded file."
+            : "Upload and manage customer verification documents."}
+        </p>
+      </div>
 
-      <select
-        name="document_type"
-        value={formData.document_type}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Select Document Type</option>
-        <option value="Aadhaar Card">Aadhaar Card</option>
-        <option value="PAN Card">PAN Card</option>
-        <option value="Driving License">Driving License</option>
-        <option value="Passport">Passport</option>
-        <option value="Other">Other</option>
-      </select>
+      <div className="row g-3">
+        <div className="col-12 col-md-6">
+          <label htmlFor="user_id" className="form-label">
+            Customer
+          </label>
 
-      {isEditing && selectedDocument?.document_path && (
-        <div>
-          <p>
-            Current document:{" "}
-            <a
-              href={`http://localhost:5000/${selectedDocument.document_path}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              View Current Document
-            </a>
-          </p>
+          <select
+            id="user_id"
+            name="user_id"
+            className="form-select"
+            value={formData.user_id}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Customer</option>
 
-          <small>
-            Choose a new file only if you want to replace the current document.
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.full_name || user.fullName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="col-12 col-md-6">
+          <label htmlFor="document_type" className="form-label">
+            Document Type
+          </label>
+
+          <select
+            id="document_type"
+            name="document_type"
+            className="form-select"
+            value={formData.document_type}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Document Type</option>
+            <option value="Aadhaar Card">Aadhaar Card</option>
+            <option value="PAN Card">PAN Card</option>
+            <option value="Driving License">Driving License</option>
+            <option value="Passport">Passport</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div className="col-12 col-md-6">
+          <label htmlFor="document" className="form-label">
+            Document File
+          </label>
+
+          <input
+            id="document"
+            type="file"
+            className="form-control"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={handleFileChange}
+            required={!isEditing}
+          />
+
+          <small className="text-muted">
+            Accepted formats: PDF, JPG, JPEG and PNG.
           </small>
         </div>
-      )}
-      
-      <input
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png"
-        onChange={handleFileChange}
-        {...(!isEditing ? { required: true } : {})}
-      />
 
-      {isEditing ? (
-        <select
-          name="verification_status"
-          value={formData.verification_status}
-          onChange={handleChange}
-          required
-        >
-          <option value="Pending">Pending</option>
-          <option value="Verified">Verified</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-      ) : (
-        <p>
-          Verification Status: <strong>Pending</strong>
-        </p>
-      )}
+        <div className="col-12 col-md-6">
+          <label htmlFor="verification_status" className="form-label">
+            Verification Status
+          </label>
 
-      <button type="submit">
-        {isEditing ? "Update Document" : "Upload Document"}
-      </button>
+          {isEditing ? (
+            <select
+              id="verification_status"
+              name="verification_status"
+              className="form-select"
+              value={formData.verification_status}
+              onChange={handleChange}
+              required
+            >
+              <option value="Pending">Pending</option>
+              <option value="Verified">Verified</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          ) : (
+            <div className="document-pending-status">Pending</div>
+          )}
+        </div>
+
+        {isEditing && selectedDocument?.document_path && (
+          <div className="col-12">
+            <div className="document-current-file">
+              <div>
+                <strong>Current document</strong>
+
+                <p className="mb-1">
+                  A file is already uploaded for this record.
+                </p>
+
+                <small className="text-muted">
+                  Select a new file only when you want to replace it.
+                </small>
+              </div>
+
+              <a
+                href={`${API_BASE_URL}/${selectedDocument.document_path.replace(
+                  /\\/g,
+                  "/"
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline-primary btn-sm"
+              >
+                View Current Document
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="document-form-actions">
+        <button type="submit" className="btn btn-primary">
+          {isEditing ? "Update Document" : "Upload Document"}
+        </button>
+      </div>
     </form>
   );
 };

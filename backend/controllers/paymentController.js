@@ -4,6 +4,8 @@ const {
   getPaymentById,
   updatePayment,
   deletePayment,
+  getCustomerPayments,
+  checkUserPolicyBelongsToAgent
 } = require("../models/paymentModel");
 
 // Create Payment
@@ -15,8 +17,21 @@ const addPayment = async (req, res) => {
       payment_date,
       due_date,
       payment_method,
-      payment_status,
+      payment_status
     } = req.body;
+
+    if (req.user.role === "agent") {
+      const belongsToAgent = await checkUserPolicyBelongsToAgent(
+        user_policy_id,
+        req.user.id
+      );
+
+      if (!belongsToAgent) {
+        return res.status(403).json({
+          message: "You can record payments only for your own customers"
+        });
+      }
+    }
 
     const payment = await createPayment(
       user_policy_id,
@@ -29,13 +44,13 @@ const addPayment = async (req, res) => {
 
     res.status(201).json({
       message: "Payment added successfully",
-      payment,
+      payment
     });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
-      message: "Failed to add payment",
+      message: "Failed to add payment"
     });
   }
 };
@@ -43,12 +58,7 @@ const addPayment = async (req, res) => {
 // Get All Payments
 const getPayments = async (req, res) => {
   try {
-    const {
-      search = "",
-      status = "",
-      page = 1,
-      limit = 5,
-    } = req.query;
+    const { search = "", status = "", page = 1, limit = 5 } = req.query;
 
     const currentPage = Math.max(Number(page) || 1, 1);
     const recordsPerPage = Math.max(Number(limit) || 5, 1);
@@ -58,11 +68,11 @@ const getPayments = async (req, res) => {
       status: status.trim(),
       page: currentPage,
       limit: recordsPerPage,
+      role: req.user.role,
+      userId: req.user.id
     });
 
-    const totalPages = Math.ceil(
-      result.totalRecords / recordsPerPage
-    );
+    const totalPages = Math.ceil(result.totalRecords / recordsPerPage);
 
     res.status(200).json({
       message: "Payments fetched successfully",
@@ -71,14 +81,14 @@ const getPayments = async (req, res) => {
         currentPage,
         totalPages,
         totalRecords: result.totalRecords,
-        limit: recordsPerPage,
-      },
+        limit: recordsPerPage
+      }
     });
   } catch (error) {
     console.error("Error fetching payments:", error);
 
     res.status(500).json({
-      message: "Failed to fetch payments",
+      message: "Failed to fetch payments"
     });
   }
 };
@@ -88,23 +98,23 @@ const getPayment = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const payment = await getPaymentById(id);
+    const payment = await getPaymentById(id, req.user.role, req.user.id);
 
     if (!payment) {
       return res.status(404).json({
-        message: "Payment not found",
+        message: "Payment not found or you cannot access it"
       });
     }
 
     res.status(200).json({
       message: "Payment fetched successfully",
-      payment,
+      payment
     });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
-      message: "Failed to fetch payment",
+      message: "Failed to fetch payment"
     });
   }
 };
@@ -120,7 +130,7 @@ const updatePaymentDetails = async (req, res) => {
       payment_date,
       due_date,
       payment_method,
-      payment_status,
+      payment_status
     } = req.body;
 
     const payment = await updatePayment(
@@ -135,19 +145,19 @@ const updatePaymentDetails = async (req, res) => {
 
     if (!payment) {
       return res.status(404).json({
-        message: "Payment not found",
+        message: "Payment not found"
       });
     }
 
     res.status(200).json({
       message: "Payment updated successfully",
-      payment,
+      payment
     });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
-      message: "Failed to update payment",
+      message: "Failed to update payment"
     });
   }
 };
@@ -161,19 +171,40 @@ const deletePaymentDetails = async (req, res) => {
 
     if (!payment) {
       return res.status(404).json({
-        message: "Payment not found",
+        message: "Payment not found"
       });
     }
 
     res.status(200).json({
       message: "Payment deleted successfully",
-      payment,
+      payment
     });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
-      message: error.message,
+      message: error.message
+    });
+  }
+};
+
+// Get logged-in customer's payments
+const getMyPayments = async (req, res) => {
+  try {
+    const customerId = req.user.id;
+
+    const payments = await getCustomerPayments(customerId);
+
+    return res.status(200).json({
+      message: "Customer payments fetched successfully",
+      data: payments
+    });
+  } catch (error) {
+    console.error("Error fetching customer payments:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch customer payments",
+      error: error.message
     });
   }
 };
@@ -184,4 +215,5 @@ module.exports = {
   getPayment,
   updatePaymentDetails,
   deletePaymentDetails,
+  getMyPayments
 };

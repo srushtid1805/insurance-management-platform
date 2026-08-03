@@ -5,12 +5,15 @@ import {
   assignUserPolicy,
   updateUserPolicy
 } from "../../services/userPolicyService";
+import { toast } from "react-toastify";
 
 function UserPolicyForm({
   fetchUserPolicies,
   selectedUserPolicy,
   setSelectedUserPolicy
 }) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role;
   const [formData, setFormData] = useState({
     user_id: "",
     policy_id: "",
@@ -23,9 +26,6 @@ function UserPolicyForm({
 
   const [customers, setCustomers] = useState([]);
   const [policies, setPolicies] = useState([]);
-
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     fetchCustomers();
@@ -68,30 +68,29 @@ function UserPolicyForm({
 
   const fetchCustomers = async () => {
     try {
-      const data = await getCustomers();
-
-      console.log("Customers response:", data);
-
-      setCustomers(data.customers || data.users || []);
+      const data = await getCustomers("", 1, 100);
+      setCustomers(data.data || []);
     } catch (error) {
       console.error(error);
+
       setCustomers([]);
+
+      toast.error(error.response?.data?.message || "Failed to load customers.");
     }
   };
 
   const fetchPolicies = async () => {
     try {
-      const data = await getPolicies();
-
-      console.log("Policies response:", data);
-
-      setPolicies(data.policies || []);
+      const data = await getPolicies("", "", 1, 100);
+      setPolicies(data.data || []);
     } catch (error) {
       console.error(error);
+
       setPolicies([]);
+
+      toast.error(error.response?.data?.message || "Failed to load policies.");
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -104,18 +103,33 @@ function UserPolicyForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setSuccessMessage("");
-    setErrorMessage("");
-
     if (!formData.user_id || !formData.policy_id || !formData.purchase_date) {
-      setErrorMessage("Customer, policy, and purchase date are required.");
+      toast.error("Customer, policy, and purchase date are required.");
+      return;
+    }
+
+    // Next Premium Date Validation
+    if (
+      formData.next_premium_date &&
+      formData.next_premium_date < formData.purchase_date
+    ) {
+      toast.error("Next premium date cannot be before the purchase date.");
+      return;
+    }
+
+    // Expiry Date Validation
+    if (
+      formData.expiry_date &&
+      formData.expiry_date <= formData.purchase_date
+    ) {
+      toast.error("Expiry date must be after the purchase date.");
       return;
     }
 
     try {
       let data;
 
-      if (selectedUserPolicy) {
+      if (selectedUserPolicy && role === "admin") {
         data = await updateUserPolicy(selectedUserPolicy.id, formData);
       } else {
         data = await assignUserPolicy(formData);
@@ -123,9 +137,9 @@ function UserPolicyForm({
 
       await fetchUserPolicies();
 
-      setSuccessMessage(
+      toast.success(
         data.message ||
-          (selectedUserPolicy
+          (selectedUserPolicy && role === "admin"
             ? "User policy updated successfully."
             : "Policy assigned successfully.")
       );
@@ -134,133 +148,164 @@ function UserPolicyForm({
     } catch (error) {
       console.error("Error saving user policy:", error);
 
-      setErrorMessage(
+      toast.error(
         error.response?.data?.message || "Failed to save user policy."
       );
     }
   };
 
   return (
-    <div className="container mt-4">
-      <h2>{selectedUserPolicy ? "Update Assigned Policy" : "Assign Policy"}</h2>
-      {successMessage && <p className="text-success">{successMessage}</p>}
+    <div>
+      <div className="policy-form-header">
+        <p className="policy-form-eyebrow">POLICY ASSIGNMENT</p>
 
-      {errorMessage && <p className="text-danger">{errorMessage}</p>}
+        <h3>
+          {selectedUserPolicy && role === "admin"
+            ? "Update Assigned Policy"
+            : "Assign Policy"}
+        </h3>
+
+        <p>
+          Assign insurance policies to customers and manage their policy
+          details.
+        </p>
+      </div>
+
       <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Customer</label>
+        <div className="row g-4">
+          <div className="col-md-6">
+            <label className="form-label">Customer</label>
 
-          <select
-            className="form-select"
-            name="user_id"
-            value={formData.user_id}
-            onChange={handleChange}
-          >
-            <option value="">Select Customer</option>
+            <select
+              className="form-select"
+              name="user_id"
+              value={formData.user_id}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Customer</option>
 
-            {customers.map((customer) => (
-              <option key={customer.id} value={customer.id}>
-                {customer.full_name}
-              </option>
-            ))}
-          </select>
+              {customers
+                .filter((customer) => customer.full_name)
+                .map((customer) => (
+                  <option key={customer.id} value={customer.id}>
+                    {customer.full_name}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Policy</label>
+
+            <select
+              className="form-select"
+              name="policy_id"
+              value={formData.policy_id}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Policy</option>
+
+              {policies
+                .filter((policy) => policy.policy_name)
+                .map((policy) => (
+                  <option key={policy.policy_id} value={policy.policy_id}>
+                    {policy.policy_name}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Nominee Name</label>
+
+            <input
+              type="text"
+              className="form-control"
+              name="nominee_name"
+              value={formData.nominee_name}
+              onChange={handleChange}
+              placeholder="Enter nominee name"
+              required
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Policy Status</label>
+
+            <select
+              className="form-select"
+              name="policy_status"
+              value={formData.policy_status}
+              onChange={handleChange}
+            >
+              <option value="Active">Active</option>
+
+              <option value="Expired">Expired</option>
+
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label">Purchase Date</label>
+
+            <input
+              type="date"
+              className="form-control"
+              name="purchase_date"
+              value={formData.purchase_date}
+              onChange={handleChange}
+              required
+              max={new Date().toISOString().split("T")[0]}
+            />
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label">Next Premium Date</label>
+
+            <input
+              type="date"
+              className="form-control"
+              name="next_premium_date"
+              value={formData.next_premium_date}
+              onChange={handleChange}
+              min={formData.purchase_date}
+            />
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label">Expiry Date</label>
+
+            <input
+              type="date"
+              className="form-control"
+              name="expiry_date"
+              value={formData.expiry_date}
+              onChange={handleChange}
+              min={formData.purchase_date}
+            />
+          </div>
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">Policy</label>
-
-          <select
-            className="form-select"
-            name="policy_id"
-            value={formData.policy_id}
-            onChange={handleChange}
-          >
-            <option value="">Select Policy</option>
-
-            {policies.map((policy) => (
-              <option key={policy.policy_id} value={policy.policy_id}>
-                {policy.policy_name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Nominee Name</label>
-
-          <input
-            type="text"
-            className="form-control"
-            name="nominee_name"
-            value={formData.nominee_name}
-            onChange={handleChange}
-            placeholder="Enter nominee name"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Purchase Date</label>
-
-          <input
-            type="date"
-            className="form-control"
-            name="purchase_date"
-            value={formData.purchase_date}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Next Premium Date</label>
-
-          <input
-            type="date"
-            className="form-control"
-            name="next_premium_date"
-            value={formData.next_premium_date}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Expiry Date</label>
-
-          <input
-            type="date"
-            className="form-control"
-            name="expiry_date"
-            value={formData.expiry_date}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Policy Status</label>
-
-          <select
-            className="form-select"
-            name="policy_status"
-            value={formData.policy_status}
-            onChange={handleChange}
-          >
-            <option value="Active">Active</option>
-            <option value="Expired">Expired</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-        </div>
-
-        <button type="submit" className="btn btn-primary">
-          {selectedUserPolicy ? "Update Policy" : "Assign Policy"}
-        </button>
-
-        {selectedUserPolicy && (
-          <button
-            type="button"
-            className="btn btn-secondary ms-2"
-            onClick={resetForm}
-          >
-            Cancel
+        <div className="policy-form-actions">
+          <button type="submit" className="btn btn-primary">
+            {selectedUserPolicy && role === "admin"
+              ? "Update Policy"
+              : "Assign Policy"}
           </button>
-        )}
+
+          {selectedUserPolicy && role === "admin" && (
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={resetForm}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

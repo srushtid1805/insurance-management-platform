@@ -2,7 +2,7 @@ import {
   ArcElement,
   Chart as ChartJS,
   Legend,
-  Tooltip,
+  Tooltip
 } from "chart.js";
 
 import { Doughnut } from "react-chartjs-2";
@@ -13,7 +13,9 @@ ChartJS.register(
   Legend
 );
 
-const ClaimStatisticsChart = ({ statistics = [] }) => {
+const ClaimStatisticsChart = ({
+  statistics = []
+}) => {
   const getStatusTotal = (status) => {
     const item = statistics.find(
       (claim) =>
@@ -21,11 +23,15 @@ const ClaimStatisticsChart = ({ statistics = [] }) => {
         status.toLowerCase()
     );
 
-    return item?.total ?? 0;
+    return Number(item?.total ?? 0);
   };
 
   const chartData = {
-    labels: ["Pending", "Approved", "Rejected"],
+    labels: [
+      "Pending",
+      "Approved",
+      "Rejected"
+    ],
 
     datasets: [
       {
@@ -33,17 +39,23 @@ const ClaimStatisticsChart = ({ statistics = [] }) => {
         data: [
           getStatusTotal("Pending"),
           getStatusTotal("Approved"),
-          getStatusTotal("Rejected"),
+          getStatusTotal("Rejected")
         ],
         backgroundColor: [
           "#f59e0b",
           "#16a34a",
-          "#dc2626",
+          "#dc2626"
         ],
-        borderWidth: 0,
-      },
-    ],
+        borderWidth: 0
+      }
+    ]
   };
+
+  const totalClaims =
+    chartData.datasets[0].data.reduce(
+      (sum, value) => sum + value,
+      0
+    );
 
   const options = {
     responsive: true,
@@ -52,8 +64,29 @@ const ClaimStatisticsChart = ({ statistics = [] }) => {
     plugins: {
       legend: {
         position: "bottom",
+
+        labels: {
+          boxWidth: 12,
+          padding: 14,
+
+          font: {
+            size: 12
+          }
+        }
       },
-    },
+
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const value = Number(context.raw);
+
+            return `${context.label}: ${value} claim${
+              value === 1 ? "" : "s"
+            }`;
+          }
+        }
+      }
+    }
   };
 
   return (
@@ -61,10 +94,16 @@ const ClaimStatisticsChart = ({ statistics = [] }) => {
       <h2>Claim Statistics</h2>
 
       <div className="chart-wrapper">
-        <Doughnut
-          data={chartData}
-          options={options}
-        />
+        {totalClaims === 0 ? (
+          <div className="h-100 d-flex align-items-center justify-content-center text-muted">
+            No claim statistics available.
+          </div>
+        ) : (
+          <Doughnut
+            data={chartData}
+            options={options}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,6 @@
 import api from "./api";
-import axios from "axios";
 
 const CUSTOMER_URL = "/customers";
-const AUTH_URL = "http://localhost:5000/api/auth";
 
 export const getCustomers = async (
   search = "",
@@ -14,8 +12,8 @@ export const getCustomers = async (
       params: {
         search,
         page,
-        limit,
-      },
+        limit
+      }
     });
 
     return response.data;
@@ -40,8 +38,8 @@ export const deleteCustomer = async (id) => {
 
 export const addCustomer = async (customerData) => {
   try {
-    const response = await axios.post(
-      `${AUTH_URL}/register`,
+    const response = await api.post(
+      "/auth/register",
       customerData
     );
 

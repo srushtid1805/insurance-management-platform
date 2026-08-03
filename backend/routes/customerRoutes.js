@@ -6,11 +6,12 @@ const {
   getCustomer,
   updateCustomerDetails,
   deleteCustomerDetails,
+  fetchCustomerPolicies
 } = require("../controllers/customerController");
 
 const {
   protect,
-  authorizeRoles,
+  authorizeRoles
 } = require("../middleware/authMiddleware");
 
 // Get all customers
@@ -19,6 +20,15 @@ router.get(
   protect,
   authorizeRoles("admin", "agent"),
   getCustomers
+);
+
+// Customer: get their own policies
+// This must remain before "/:id"
+router.get(
+  "/my-policies",
+  protect,
+  authorizeRoles("customer"),
+  fetchCustomerPolicies
 );
 
 // Get customer by ID

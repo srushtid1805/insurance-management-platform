@@ -35,18 +35,20 @@ const createClaim = async (
 
 
 // Get All Claims
+// Get all claims
 const getAllClaims = async ({
   search = "",
   status = "",
   page = 1,
   limit = 5,
+  role,
+  userId
 }) => {
   const offset = (page - 1) * limit;
 
   const values = [];
   const conditions = [];
 
-  // Search
   if (search) {
     values.push(`%${search}%`);
 
@@ -60,7 +62,6 @@ const getAllClaims = async ({
     `);
   }
 
-  // Status Filter
   if (status) {
     values.push(status);
 
@@ -69,31 +70,35 @@ const getAllClaims = async ({
     `);
   }
 
+  if (role === "agent") {
+    values.push(userId);
+
+    conditions.push(`
+      u.agent_id = $${values.length}
+    `);
+  }
+
   const whereClause =
     conditions.length > 0
       ? `WHERE ${conditions.join(" AND ")}`
       : "";
 
-  // Total Records
-  const countQuery = `
-    SELECT COUNT(*) AS total_records
-
-    FROM claims c
-
-    JOIN user_policies up
-      ON c.user_policy_id = up.id
-
-    JOIN users u
-      ON up.user_id = u.id
-
-    JOIN policies p
-      ON up.policy_id = p.policy_id
-
-    ${whereClause};
-  `;
-
   const countResult = await pool.query(
-    countQuery,
+    `
+      SELECT COUNT(*) AS total_records
+      FROM claims c
+
+      JOIN user_policies up
+        ON c.user_policy_id = up.id
+
+      JOIN users u
+        ON up.user_id = u.id
+
+      JOIN policies p
+        ON up.policy_id = p.policy_id
+
+      ${whereClause};
+    `,
     values
   );
 
@@ -101,70 +106,104 @@ const getAllClaims = async ({
     countResult.rows[0].total_records
   );
 
-  values.push(limit);
-  const limitPosition = values.length;
-
-  values.push(offset);
-  const offsetPosition = values.length;
-
-  // Fetch Claims
-  const query = `
-    SELECT
-      c.claim_id,
-      c.user_policy_id,
-      c.claim_amount,
-      c.claim_reason,
-      c.claim_date,
-      c.claim_status,
-
-      u.full_name,
-      u.email,
-
-      p.policy_name,
-      p.policy_type
-
-    FROM claims c
-
-    JOIN user_policies up
-      ON c.user_policy_id = up.id
-
-    JOIN users u
-      ON up.user_id = u.id
-
-    JOIN policies p
-      ON up.policy_id = p.policy_id
-
-    ${whereClause}
-
-    ORDER BY c.claim_id DESC
-
-    LIMIT $${limitPosition}
-    OFFSET $${offsetPosition};
-  `;
+  const listValues = [...values, limit, offset];
+  const limitPosition = listValues.length - 1;
+  const offsetPosition = listValues.length;
 
   const result = await pool.query(
-    query,
-    values
+    `
+      SELECT
+        c.claim_id,
+        c.user_policy_id,
+        c.claim_amount,
+        c.claim_reason,
+        c.claim_date,
+        c.claim_status,
+
+        u.full_name,
+        u.email,
+
+        p.policy_name,
+        p.policy_type
+
+      FROM claims c
+
+      JOIN user_policies up
+        ON c.user_policy_id = up.id
+
+      JOIN users u
+        ON up.user_id = u.id
+
+      JOIN policies p
+        ON up.policy_id = p.policy_id
+
+      ${whereClause}
+
+      ORDER BY c.claim_id DESC
+
+      LIMIT $${limitPosition}
+      OFFSET $${offsetPosition};
+    `,
+    listValues
   );
 
   return {
     claims: result.rows,
-    totalRecords,
+    totalRecords
   };
 };
 
 // Get Claim By ID
-const getClaimById = async (claim_id) => {
+// Get claim by ID
+const getClaimById = async (
+  claimId,
+  role,
+  userId
+) => {
+  const values = [claimId];
+  const conditions = ["c.claim_id = $1"];
+
+  if (role === "agent") {
+    values.push(userId);
+
+    conditions.push(`
+      u.agent_id = $${values.length}
+    `);
+  }
+
   const result = await pool.query(
     `
-      SELECT *
-      FROM claims
-      WHERE claim_id = $1;
+      SELECT
+        c.claim_id,
+        c.user_policy_id,
+        c.claim_amount,
+        c.claim_reason,
+        c.claim_date,
+        c.claim_status,
+
+        u.full_name,
+        u.email,
+
+        p.policy_name,
+        p.policy_type
+
+      FROM claims c
+
+      JOIN user_policies up
+        ON c.user_policy_id = up.id
+
+      JOIN users u
+        ON up.user_id = u.id
+
+      JOIN policies p
+        ON up.policy_id = p.policy_id
+
+      WHERE ${conditions.join(" AND ")};
     `,
-    [claim_id]
+    values
   );
 
-  return result.rows[0];
+  return result.rows[0] || null;
 };
 
 // Update Claim
@@ -215,10 +254,67 @@ const deleteClaim = async (claim_id) => {
   return result.rows[0];
 };
 
+// Get logged-in customer's claims
+const getCustomerClaims = async (customerId) => {
+  const result = await pool.query(
+    `
+      SELECT
+        c.claim_id,
+        c.claim_amount,
+        c.claim_reason,
+        c.claim_date,
+        c.claim_status,
+
+        up.id AS user_policy_id,
+
+        p.policy_name,
+        p.policy_type
+
+      FROM claims c
+
+      JOIN user_policies up
+        ON c.user_policy_id = up.id
+
+      JOIN policies p
+        ON up.policy_id = p.policy_id
+
+      WHERE up.user_id = $1
+
+      ORDER BY c.claim_date DESC, c.claim_id DESC;
+    `,
+    [customerId]
+  );
+
+  return result.rows;
+};
+
+const checkUserPolicyBelongsToAgent = async (
+  userPolicyId,
+  agentId
+) => {
+  const result = await pool.query(
+    `
+      SELECT up.id
+      FROM user_policies up
+
+      JOIN users u
+        ON up.user_id = u.id
+
+      WHERE up.id = $1
+        AND u.agent_id = $2;
+    `,
+    [userPolicyId, agentId]
+  );
+
+  return Boolean(result.rows[0]);
+};
+
 module.exports = {
   createClaim,
   getAllClaims,
   getClaimById,
   updateClaim,
   deleteClaim,
+  getCustomerClaims,
+  checkUserPolicyBelongsToAgent,
 };

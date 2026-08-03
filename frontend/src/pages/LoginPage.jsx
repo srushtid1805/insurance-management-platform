@@ -35,14 +35,22 @@ const LoginPage = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      window.dispatchEvent(new Event("authChanged"));
+
       const role = data.user.role;
 
       if (role === "admin") {
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       } else if (role === "agent") {
-        navigate("/customers");
+        navigate("/agent-dashboard", {
+          replace: true
+        });
       } else if (role === "customer") {
-        navigate("/user-policies");
+        navigate("/customer-dashboard", {
+          replace: true
+        });
+      } else {
+        navigate("/login", { replace: true });
       }
     } catch (error) {
       setErrorMessage(error.message || "Login failed. Please try again.");

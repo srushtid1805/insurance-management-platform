@@ -14,6 +14,11 @@ const documentRoutes = require("./routes/documentRoutes");
 
 const reportRoutes = require("./routes/reportRoutes");
 
+const agentDashboardRoutes = require("./routes/agentDashboardRoutes");
+const customerDashboardRoutes = require(
+  "./routes/customerDashboardRoutes"
+);
+
 
 const app = express();
 
@@ -46,6 +51,9 @@ pool.connect()
     app.use("/api/documents", documentRoutes);
 
     app.use("/api/reports", reportRoutes);
+
+    app.use("/api/agent", agentDashboardRoutes);
+    app.use("/api/customer", customerDashboardRoutes);
 
     // Start Server
     app.listen(PORT,()=>{

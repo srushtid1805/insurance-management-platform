@@ -7,46 +7,61 @@ const {
   getPayment,
   updatePaymentDetails,
   deletePaymentDetails,
+  getMyPayments
 } = require("../controllers/paymentController");
 
 const {
   protect,
-  authorizeRoles,
+  authorizeRoles
 } = require("../middleware/authMiddleware");
 
-// Create Payment
+// Create payment
 router.post(
-  "/", 
+  "/",
   protect,
-  authorizeRoles("admin"),
-  addPayment);
+  authorizeRoles("admin","agent"),
+  addPayment
+);
 
-// Get All Payments
+// Get all payments for admin and agent
 router.get(
-  "/", 
+  "/",
   protect,
   authorizeRoles("admin", "agent"),
-  getPayments);
+  getPayments
+);
 
-// Get Payment By ID
+// Customer: get only their own payments
+// Keep this before "/:id"
 router.get(
-  "/:id", 
+  "/my-payments",
+  protect,
+  authorizeRoles("customer"),
+  getMyPayments
+);
+
+// Get payment by ID
+router.get(
+  "/:id",
   protect,
   authorizeRoles("admin", "agent"),
-  getPayment);
+  getPayment
+);
 
-// Update Payment
+// Update payment
 router.put(
-  "/:id", 
+  "/:id",
   protect,
   authorizeRoles("admin"),
-  updatePaymentDetails);
+  updatePaymentDetails
+);
 
-// Delete Payment
+// Delete payment
 router.delete(
-  "/:id", 
+  "/:id",
   protect,
   authorizeRoles("admin"),
-  deletePaymentDetails);
+  deletePaymentDetails
+);
 
 module.exports = router;

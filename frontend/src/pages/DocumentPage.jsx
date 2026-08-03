@@ -1,14 +1,30 @@
+import "./DocumentPage.css";
+
+import {
+  FaSearch,
+  FaFileAlt,
+  FaEdit,
+  FaTrash,
+  FaClock,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaExternalLinkAlt
+} from "react-icons/fa";
+
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import DocumentForm from "../components/documents/DocumentForm";
 
 import {
   getAllDocuments,
   createDocument,
   updateDocument,
-  deleteDocument,
+  deleteDocument
 } from "../services/documentService";
 
 import { getCustomers } from "../services/customerService";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 const DocumentPage = () => {
   const [documents, setDocuments] = useState([]);
@@ -16,6 +32,9 @@ const DocumentPage = () => {
 
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = user?.role;
 
   // Search, Filter & Pagination
   const [search, setSearch] = useState("");
@@ -29,7 +48,7 @@ const DocumentPage = () => {
     currentPage: 1,
     totalPages: 1,
     totalRecords: 0,
-    limit: 5,
+    limit: 5
   });
 
   const [loading, setLoading] = useState(false);
@@ -55,17 +74,19 @@ const DocumentPage = () => {
           currentPage: 1,
           totalPages: 1,
           totalRecords: 0,
-          limit,
+          limit
         }
       );
     } catch (error) {
       console.error("Error fetching documents:", error);
 
+      const message =
+        error.response?.data?.message || "Failed to fetch documents";
+
       setDocuments([]);
-      setError(
-        error.response?.data?.message ||
-          "Failed to fetch documents"
-      );
+      setError(message);
+
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -74,11 +95,7 @@ const DocumentPage = () => {
   // Fetch Customers
   const fetchUsers = async () => {
     try {
-      const response = await getCustomers(
-        "",
-        1,
-        1000
-      );
+      const response = await getCustomers("", 1, 1000);
 
       setUsers(
         Array.isArray(response)
@@ -87,7 +104,10 @@ const DocumentPage = () => {
       );
     } catch (error) {
       console.error("Error fetching customers:", error);
+
       setUsers([]);
+
+      toast.error(error.response?.data?.message || "Failed to load customers");
     }
   };
 
@@ -114,18 +134,15 @@ const DocumentPage = () => {
     try {
       await createDocument(formData);
 
-      setPage(1);
-
-      if (page === 1) {
+      if (page !== 1) {
+        setPage(1);
+      } else {
         await fetchDocuments();
       }
 
-      alert("Document uploaded successfully");
+      toast.success("Document uploaded successfully");
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
-          "Failed to upload document"
-      );
+      toast.error(error.response?.data?.message || "Failed to upload document");
 
       throw error;
     }
@@ -140,22 +157,16 @@ const DocumentPage = () => {
   // Update
   const handleUpdateDocument = async (formData) => {
     try {
-      await updateDocument(
-        selectedDocument.document_id,
-        formData
-      );
+      await updateDocument(selectedDocument.document_id, formData);
 
       await fetchDocuments();
 
       setSelectedDocument(null);
       setIsEditing(false);
 
-      alert("Document updated successfully");
+      toast.success("Document updated successfully");
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
-          "Failed to update document"
-      );
+      toast.error(error.response?.data?.message || "Failed to update document");
 
       throw error;
     }
@@ -178,12 +189,9 @@ const DocumentPage = () => {
         await fetchDocuments();
       }
 
-      alert("Document deleted successfully");
+      toast.success("Document deleted successfully");
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
-          "Failed to delete document"
-      );
+      toast.error(error.response?.data?.message || "Failed to delete document");
     }
   };
 
@@ -217,6 +225,9 @@ const DocumentPage = () => {
         <button
           key={pageNumber}
           type="button"
+          className={`btn btn-sm ${
+            pageNumber === page ? "btn-primary" : "btn-outline-primary"
+          }`}
           onClick={() => setPage(pageNumber)}
           disabled={pageNumber === page || loading}
         >
@@ -229,190 +240,288 @@ const DocumentPage = () => {
   };
 
   return (
-    <div>
-      <h1>Document Management</h1>
-
-      <DocumentForm
-        onSubmit={
-          isEditing
-            ? handleUpdateDocument
-            : handleAddDocument
-        }
-        selectedDocument={selectedDocument}
-        isEditing={isEditing}
-        users={users}
-      />
-
-      {isEditing && (
-        <button
-          type="button"
-          onClick={handleCancelEdit}
-        >
-          Cancel Edit
-        </button>
-      )}
-
-      <h2>Document List</h2>
-
-      <div>
-        <label>Search Documents:</label>
-
-        <input
-          type="text"
-          placeholder="Search customer, type or path"
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-        />
-      </div>
-
-      <div>
-        <label>Filter by Status:</label>
-
-        <select
-          value={status}
-          onChange={handleStatusChange}
-        >
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Verified">Verified</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Records per page:</label>
-
-        <select
-          value={limit}
-          onChange={handleLimitChange}
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="20">20</option>
-        </select>
-      </div>
-
-      {error && <p>{error}</p>}
-
-      {loading && <p>Loading documents...</p>}
-
-      <table border="1">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Customer</th>
-            <th>Document Type</th>
-            <th>Status</th>
-            <th>Uploaded At</th>
-            <th>Document</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {!loading &&
-          documents.length === 0 ? (
-            <tr>
-              <td colSpan="7">
-                No documents found
-              </td>
-            </tr>
-          ) : (
-            documents.map((document) => (
-              <tr key={document.document_id}>
-                <td>{document.document_id}</td>
-
-                <td>{document.full_name}</td>
-
-                <td>{document.document_type}</td>
-
-                <td>
-                  {document.verification_status}
-                </td>
-
-                <td>
-                  {document.uploaded_at
-                    ? new Date(
-                        document.uploaded_at
-                      ).toLocaleString()
-                    : ""}
-                </td>
-
-                <td>
-                  <a
-                    href={`http://localhost:5000/${document.document_path}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    View Document
-                  </a>
-                </td>
-
-                <td>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleEdit(document)
-                    }
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleDelete(
-                        document.document_id
-                      )
-                    }
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-
-      {pagination.totalRecords > 0 && (
+    <div className="document-page">
+      <div className="document-page-header">
         <div>
-          <p>
-            Showing page {pagination.currentPage} of{" "}
-            {pagination.totalPages}
-            {" — "}
-            Total records:{" "}
-            {pagination.totalRecords}
+          <p className="document-page-eyebrow">Customer Documents</p>
+
+          <h1>Document Management</h1>
+
+          <p className="document-page-subtitle">
+            Upload, verify and manage customer documents.
           </p>
-
-          <button
-            type="button"
-            onClick={() =>
-              setPage((p) => p - 1)
-            }
-            disabled={page === 1 || loading}
-          >
-            Previous
-          </button>
-
-          {renderPageNumbers()}
-
-          <button
-            type="button"
-            onClick={() =>
-              setPage((p) => p + 1)
-            }
-            disabled={
-              page === pagination.totalPages ||
-              loading
-            }
-          >
-            Next
-          </button>
         </div>
-      )}
+
+        <div className="document-count-card">
+          <div className="document-count-icon">
+            <FaFileAlt />
+          </div>
+
+          <div>
+            <small>Total Documents</small>
+            <h3>{pagination.totalRecords}</h3>
+          </div>
+        </div>
+      </div>
+
+      <section className="document-section-card">
+        {role === "admin" || role === "agent" ? (
+          <DocumentForm
+            onSubmit={
+              isEditing && role === "admin"
+                ? handleUpdateDocument
+                : handleAddDocument
+            }
+            selectedDocument={role === "admin" ? selectedDocument : null}
+            isEditing={role === "admin" ? isEditing : false}
+            users={users}
+          />
+        ) : null}
+
+        {role === "admin" && isEditing && (
+          <div className="document-cancel-wrapper">
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={handleCancelEdit}
+            >
+              Cancel Edit
+            </button>
+          </div>
+        )}
+      </section>
+
+      <section className="document-section-card document-list-section">
+        <div className="document-toolbar">
+          <div className="document-search-wrapper">
+            <FaSearch className="document-search-icon" />
+
+            <input
+              type="search"
+              className="form-control"
+              placeholder="Search customer, type or file path..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              aria-label="Search documents"
+            />
+          </div>
+
+          <div className="document-status-wrapper">
+            <label htmlFor="document-status">Status</label>
+
+            <select
+              id="document-status"
+              className="form-select"
+              value={status}
+              onChange={handleStatusChange}
+              disabled={loading}
+            >
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Verified">Verified</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
+          <div className="document-limit-wrapper">
+            <label htmlFor="document-limit">Records per page</label>
+
+            <select
+              id="document-limit"
+              className="form-select"
+              value={limit}
+              onChange={handleLimitChange}
+              disabled={loading}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+            </select>
+          </div>
+        </div>
+
+        {error && <div className="alert alert-danger mt-3">{error}</div>}
+
+        <div className="document-table-container">
+          {loading && (
+            <div className="document-table-loading">
+              <div
+                className="spinner-border spinner-border-sm text-primary"
+                role="status"
+              >
+                <span className="visually-hidden">Loading documents...</span>
+              </div>
+
+              <span>Loading records...</span>
+            </div>
+          )}
+
+          <div className="table-responsive mt-4">
+            <table className="table document-table align-middle">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer</th>
+                  <th>Document Type</th>
+                  <th>Status</th>
+                  <th>Uploaded At</th>
+                  <th>Document</th>
+                  {role === "admin" && <th className="text-center">Actions</th>}
+                </tr>
+              </thead>
+
+              <tbody>
+                {documents.length === 0 && !loading ? (
+                  <tr>
+                    <td
+                      colSpan={role === "admin" ? 7 : 6}
+                      className="document-empty-state"
+                    >
+                      {search || status
+                        ? "No documents match your search or filter."
+                        : "No documents found."}
+                    </td>
+                  </tr>
+                ) : (
+                  documents.map((document) => (
+                    <tr key={document.document_id}>
+                      <td>
+                        <span className="document-id">
+                          #{document.document_id}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="document-customer-cell">
+                          <div className="document-avatar">
+                            {document.full_name?.charAt(0).toUpperCase()}
+                          </div>
+
+                          <span>{document.full_name}</span>
+                        </div>
+                      </td>
+
+                      <td>
+                        <span className="document-type-badge">
+                          {document.document_type}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`document-status-badge ${
+                            document.verification_status === "Verified"
+                              ? "document-status-verified"
+                              : document.verification_status === "Pending"
+                                ? "document-status-pending"
+                                : "document-status-rejected"
+                          }`}
+                        >
+                          {document.verification_status === "Verified" ? (
+                            <FaCheckCircle />
+                          ) : document.verification_status === "Pending" ? (
+                            <FaClock />
+                          ) : (
+                            <FaTimesCircle />
+                          )}
+
+                          {document.verification_status}
+                        </span>
+                      </td>
+
+                      <td>
+                        {document.uploaded_at
+                          ? new Date(document.uploaded_at).toLocaleString(
+                              "en-IN"
+                            )
+                          : "-"}
+                      </td>
+
+                      <td>
+                        <a
+                          href={`${API_BASE_URL}/${document.document_path.replace(
+                            /\\/g,
+                            "/"
+                          )}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-outline-primary btn-sm document-view-button"
+                        >
+                          <FaExternalLinkAlt />
+                          <span>View</span>
+                        </a>
+                      </td>
+
+                      {role === "admin" && (
+                        <td>
+                          <div className="document-actions">
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary btn-sm"
+                              onClick={() => handleEdit(document)}
+                              disabled={loading}
+                            >
+                              <FaEdit />
+                              <span>Edit</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => handleDelete(document.document_id)}
+                              disabled={loading}
+                            >
+                              <FaTrash />
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {pagination.totalRecords > 0 && (
+          <div className="document-pagination">
+            <p>
+              Page {pagination.currentPage} of {pagination.totalPages} | Total
+              records: {pagination.totalRecords}
+            </p>
+
+            <div className="document-pagination-buttons">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={() =>
+                  setPage((previousPage) => Math.max(previousPage - 1, 1))
+                }
+                disabled={page === 1 || loading}
+              >
+                Previous
+              </button>
+
+              {renderPageNumbers()}
+
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={() =>
+                  setPage((previousPage) =>
+                    Math.min(previousPage + 1, pagination.totalPages)
+                  )
+                }
+                disabled={page === pagination.totalPages || loading}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 };

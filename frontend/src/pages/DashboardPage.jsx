@@ -1,5 +1,13 @@
 import "./DashboardPage.css";
-
+import {
+  FaUsers,
+  FaFileContract,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaClipboardList,
+  FaFolderOpen,
+  FaMoneyBillWave
+} from "react-icons/fa";
 import { useEffect, useState } from "react";
 import {
   getDashboardSummary,
@@ -86,57 +94,78 @@ const DashboardPage = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading dashboard...</p>;
+    return (
+      <div className="d-flex justify-content-center align-items-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading dashboard...</span>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="alert alert-danger" role="alert">
+        {error}
+      </div>
+    );
   }
 
   return (
     <div className="dashboard-page">
-      <h1>Insurance Management Dashboard</h1>
+      <div className="dashboard-header">
+        <div>
+          <p className="dashboard-eyebrow">Overview</p>
+
+          <h1>Insurance Management Dashboard</h1>
+
+          <p className="dashboard-subtitle">
+            Monitor customers, policies, claims, documents, and premium
+            collection.
+          </p>
+        </div>
+      </div>
 
       <div className="dashboard-grid">
         <DashboardCard
           title="Total Customers"
           value={summary?.total_customers ?? 0}
-          icon="👤"
+          icon={<FaUsers />}
           color="#2563eb"
         />
 
         <DashboardCard
           title="Total Policies"
           value={summary?.total_policies ?? 0}
-          icon="📄"
+          icon={<FaFileContract />}
           color="#7c3aed"
         />
 
         <DashboardCard
           title="Active Policies"
           value={summary?.active_policies ?? 0}
-          icon="✅"
+          icon={<FaCheckCircle />}
           color="#16a34a"
         />
 
         <DashboardCard
           title="Expired Policies"
           value={summary?.expired_policies ?? 0}
-          icon="❌"
+          icon={<FaTimesCircle />}
           color="#dc2626"
         />
 
         <DashboardCard
           title="Total Claims"
           value={summary?.total_claims ?? 0}
-          icon="📋"
+          icon={<FaClipboardList />}
           color="#f59e0b"
         />
 
         <DashboardCard
           title="Total Documents"
           value={summary?.total_documents ?? 0}
-          icon="📁"
+          icon={<FaFolderOpen />}
           color="#0ea5e9"
         />
 
@@ -148,7 +177,7 @@ const DashboardPage = () => {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
           })}`}
-          icon="💰"
+          icon={<FaMoneyBillWave />}
           color="#10b981"
           className="dashboard-card--wide"
         />

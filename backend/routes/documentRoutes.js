@@ -9,47 +9,63 @@ const {
   getDocument,
   updateDocumentDetails,
   deleteDocumentDetails,
+  getMyDocuments
 } = require("../controllers/documentController");
 
 const {
   protect,
-  authorizeRoles,
+  authorizeRoles
 } = require("../middleware/authMiddleware");
 
-// Upload Document
+// Upload document
 router.post(
-  "/", upload.single("document"),
+  "/",
   protect,
   authorizeRoles("admin", "agent"),
-  addDocument);
+  upload.single("document"),
+  addDocument
+);
 
-// Get All Documents
+// Get all documents for admin and agent
 router.get(
-  "/", 
+  "/",
   protect,
   authorizeRoles("admin", "agent"),
-  getDocuments);
+  getDocuments
+);
 
-// Get Document By ID
+// Customer: get only their own documents
+// Keep this before "/:id"
 router.get(
-  "/:id", 
+  "/my-documents",
+  protect,
+  authorizeRoles("customer"),
+  getMyDocuments
+);
+
+// Get document by ID
+router.get(
+  "/:id",
   protect,
   authorizeRoles("admin", "agent"),
-  getDocument);
+  getDocument
+);
 
-// Update Document
+// Update document
 router.put(
-  "/:id", 
-  upload.single("document"), 
+  "/:id",
   protect,
   authorizeRoles("admin", "agent"),
-  updateDocumentDetails);
+  upload.single("document"),
+  updateDocumentDetails
+);
 
-// Delete Document
+// Delete document
 router.delete(
-  "/:id", 
+  "/:id",
   protect,
   authorizeRoles("admin"),
-  deleteDocumentDetails);
+  deleteDocumentDetails
+);
 
 module.exports = router;

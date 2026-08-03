@@ -1,4 +1,9 @@
+import "./CustomerPage.css";
+
+import { FaSearch, FaUsers, FaEdit, FaTrash } from "react-icons/fa";
+
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import CustomerForm from "../components/customer/CustomerForm";
 
 import {
@@ -9,6 +14,9 @@ import {
 } from "../services/customerService";
 
 function CustomerPage() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const role = user?.role; //newly added
+
   const [customers, setCustomers] = useState([]);
 
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -58,6 +66,9 @@ function CustomerPage() {
 
       setCustomers([]);
       setError(error.response?.data?.message || "Failed to fetch customers.");
+      toast.error(
+        error.response?.data?.message || "Failed to fetch customers."
+      );
     } finally {
       setLoading(false);
     }
@@ -95,14 +106,17 @@ function CustomerPage() {
     try {
       await addCustomer(customerData);
 
-      setPage(1);
-      await fetchCustomers();
+      if (page !== 1) {
+        setPage(1);
+      } else {
+        await fetchCustomers();
+      }
 
-      alert("Customer added successfully!");
+      toast.success("Customer added successfully!");
     } catch (error) {
       console.error(error);
 
-      alert(error.response?.data?.message || "Failed to add customer.");
+      toast.error(error.response?.data?.message || "Failed to add customer.");
 
       throw error;
     }
@@ -117,11 +131,13 @@ function CustomerPage() {
       setSelectedCustomer(null);
       setIsEditing(false);
 
-      alert("Customer updated successfully!");
+      toast.success("Customer updated successfully!");
     } catch (error) {
       console.error("Update failed:", error.response?.data || error.message);
 
-      alert(error.response?.data?.message || "Failed to update customer.");
+      toast.error(
+        error.response?.data?.message || "Failed to update customer."
+      );
 
       throw error;
     }
@@ -149,7 +165,7 @@ function CustomerPage() {
         await fetchCustomers();
       }
 
-      alert("Customer deleted successfully!");
+      toast.success("Customer deleted successfully!");
     } catch (error) {
       console.error(error);
 
@@ -157,118 +173,196 @@ function CustomerPage() {
         error.response?.data?.message ||
         "Something went wrong while deleting the customer.";
 
-      window.alert(message);
+      toast.error(message);
     }
   };
 
   return (
-    <div>
-      <h1>Insurance Management System</h1>
-
-      <hr />
-
-      <h2>Customer Management</h2>
-
-      <CustomerForm
-        onAddCustomer={handleAddCustomer}
-        onUpdateCustomer={handleUpdateCustomer}
-        selectedCustomer={selectedCustomer}
-        isEditing={isEditing}
-      />
-
-      <hr />
-
-      {/* Search section */}
-      <div className="customer-search">
-        <input
-          type="search"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search by name, email or phone..."
-          aria-label="Search customers"
-        />
-      </div>
-
-      <br />
-
-      {/* Records-per-page selection */}
-      <div>
-        <label htmlFor="customer-limit">Records per page: </label>
-
-        <select id="customer-limit" value={limit} onChange={handleLimitChange}>
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-        </select>
-      </div>
-
-      <p>Total customers: {pagination.totalRecords}</p>
-
-      {error && <p>{error}</p>}
-
-      {loading ? (
-        <p>Loading customers...</p>
-      ) : (
-        <table border="1" cellPadding="10">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Address</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {customers.length > 0 ? (
-              customers.map((customer) => (
-                <tr key={customer.id}>
-                  <td>{customer.id}</td>
-                  <td>{customer.full_name}</td>
-                  <td>{customer.email}</td>
-                  <td>{customer.phone}</td>
-                  <td>{customer.address}</td>
-
-                  <td>
-                    <button onClick={() => handleEdit(customer)}>Edit</button>
-
-                    <button onClick={() => handleDelete(customer.id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6">No customers found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      )}
-
-      {/* Pagination */}
-      {!loading && pagination.totalRecords > 0 && (
+    <div className="customer-page">
+      <div className="customer-page-header">
         <div>
-          <button onClick={handlePreviousPage} disabled={page === 1}>
-            Previous
-          </button>
+          <p className="customer-page-eyebrow">Customer Records</p>
 
-          <span>
-            {" "}
-            Page {pagination.currentPage} of {pagination.totalPages}{" "}
-          </span>
+          <h1>Customer Management</h1>
 
-          <button
-            onClick={handleNextPage}
-            disabled={page === pagination.totalPages}
-          >
-            Next
-          </button>
+          <p className="customer-page-subtitle">
+            Add, update, search and manage registered customers.
+          </p>
         </div>
+
+        <div className="customer-count-card">
+          <div className="customer-count-icon">
+            <FaUsers />
+          </div>
+
+          <div>
+            <small>Total Customers</small>
+
+            <h3>{pagination.totalRecords}</h3>
+          </div>
+        </div>
+      </div>
+
+      {role === "admin" && (
+        <section className="customer-section-card">
+          <CustomerForm
+            onAddCustomer={handleAddCustomer}
+            onUpdateCustomer={handleUpdateCustomer}
+            selectedCustomer={selectedCustomer}
+            isEditing={isEditing}
+          />
+        </section>
       )}
+
+      <section className="customer-section-card customer-list-section">
+        <div className="customer-toolbar">
+          <div className="customer-search-wrapper">
+            <FaSearch className="customer-search-icon" />
+
+            <input
+              type="search"
+              className="form-control"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by name, email or phone..."
+              aria-label="Search customers"
+            />
+          </div>
+
+          <div className="customer-limit-wrapper">
+            <label htmlFor="customer-limit">Records per page</label>
+
+            <select
+              id="customer-limit"
+              className="form-select"
+              value={limit}
+              onChange={handleLimitChange}
+              disabled={loading}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
+          </div>
+        </div>
+
+        {error && <div className="alert alert-danger mt-3">{error}</div>}
+
+        {loading ? (
+          <div className="customer-loading-state">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading customers...</span>
+            </div>
+
+            <p>Loading customers...</p>
+          </div>
+        ) : (
+          <div className="table-responsive mt-4">
+            <table className="table customer-table align-middle">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th className="text-center">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {customers.length > 0 ? (
+                  customers.map((customer) => (
+                    <tr key={customer.id}>
+                      <td>
+                        <span className="customer-id">#{customer.id}</span>
+                      </td>
+
+                      <td>
+                        <div className="customer-name-cell">
+                          <div className="customer-avatar">
+                            {customer.full_name?.charAt(0).toUpperCase()}
+                          </div>
+
+                          <span>{customer.full_name}</span>
+                        </div>
+                      </td>
+
+                      <td>{customer.email}</td>
+                      <td>{customer.phone}</td>
+                      <td>{customer.address || "-"}</td>
+
+                      <td>
+                        {role === "admin" ? (
+                          <div className="customer-actions">
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary btn-sm"
+                              onClick={() => handleEdit(customer)}
+                              disabled={loading}
+                            >
+                              <FaEdit />
+                              <span>Edit</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => handleDelete(customer.id)}
+                              disabled={loading}
+                            >
+                              <FaTrash />
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-muted">View only</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="customer-empty-state">
+                      {search
+                        ? "No customers match your search."
+                        : "No customers found."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {!loading && pagination.totalRecords > 0 && (
+          <div className="customer-pagination">
+            <p>
+              Page {pagination.currentPage} of {pagination.totalPages}
+            </p>
+
+            <div className="customer-pagination-buttons">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+              >
+                Previous
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={handleNextPage}
+                disabled={page === pagination.totalPages}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

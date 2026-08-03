@@ -1,0 +1,365 @@
+.user-policy-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+.user-policy-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.user-policy-page-eyebrow {
+  margin: 0;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.user-policy-page-header h1 {
+  margin: 6px 0;
+  color: #1f2937;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 700;
+}
+
+.user-policy-page-subtitle {
+  margin: 0;
+  color: #6b7280;
+}
+
+/* Count card */
+.user-policy-count-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.user-policy-count-icon {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 22px;
+}
+
+.user-policy-count-card small {
+  display: block;
+  color: #6b7280;
+}
+
+.user-policy-count-card h3 {
+  margin: 4px 0 0;
+  color: #1f2937;
+  font-size: 30px;
+}
+
+/* Cards */
+.user-policy-section-card {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.user-policy-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Form */
+.policy-form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+/* Toolbar */
+.user-policy-toolbar {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.user-policy-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.user-policy-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  z-index: 2;
+  color: #6b7280;
+  transform: translateY(-50%);
+}
+
+.user-policy-search-wrapper input {
+  padding-left: 42px;
+}
+
+.user-policy-status-wrapper,
+.user-policy-limit-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-policy-status-wrapper label,
+.user-policy-limit-wrapper label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.user-policy-status-wrapper .form-select {
+  min-width: 170px;
+}
+
+.user-policy-limit-wrapper .form-select {
+  min-width: 110px;
+}
+
+/* Table */
+.user-policy-table {
+  min-width: 1250px;
+  margin: 0;
+}
+
+.user-policy-table thead th {
+  padding: 14px 16px;
+  background: #f8fafc;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.user-policy-table tbody td {
+  padding: 15px 16px;
+  color: #334155;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .user-policy-table tbody tr:hover {
+    background: #f8fafc;
+  }
+}
+
+.user-policy-id {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.user-policy-customer-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 190px;
+}
+
+.user-policy-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Status */
+.user-policy-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.user-policy-status-active {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.user-policy-status-expired {
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.user-policy-status-cancelled {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+/* Actions */
+.user-policy-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.user-policy-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* Loading / empty */
+.user-policy-loading-state {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #64748b;
+}
+
+.user-policy-loading-state p {
+  margin: 0;
+}
+
+.user-policy-empty-state {
+  padding: 45px 20px !important;
+  color: #64748b !important;
+  text-align: center;
+}
+
+/* Pagination */
+.user-policy-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.user-policy-pagination p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.user-policy-pagination-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .user-policy-page {
+    gap: 18px;
+  }
+
+  .user-policy-count-card {
+    width: 100%;
+  }
+
+  .user-policy-section-card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .user-policy-toolbar {
+    align-items: stretch;
+  }
+
+  .user-policy-search-wrapper {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .user-policy-status-wrapper,
+  .user-policy-limit-wrapper {
+    width: 100%;
+  }
+
+  .user-policy-status-wrapper .form-select,
+  .user-policy-limit-wrapper .form-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .policy-form-actions .btn {
+    flex: 1;
+  }
+
+  .user-policy-pagination {
+    align-items: stretch;
+  }
+
+  .user-policy-pagination-buttons {
+    width: 100%;
+  }
+
+  .user-policy-pagination-buttons .btn {
+    flex: 1;
+  }
+}
+
+.user-policy-table-container {
+  position: relative;
+  min-height: 220px;
+}
+
+.user-policy-table-loading {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 12px;
+
+  background: rgba(255, 255, 255, 0.95);
+  color: #475569;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}

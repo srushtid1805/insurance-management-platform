@@ -1,0 +1,149 @@
+.customer-claims-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.customer-claims-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.customer-claims-eyebrow {
+  margin: 0;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.customer-claims-header h1 {
+  margin: 6px 0;
+  color: #1f2937;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 700;
+}
+
+.customer-claims-subtitle {
+  margin: 0;
+  color: #6b7280;
+}
+
+.customer-claims-count-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.customer-claims-count-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  font-size: 22px;
+}
+
+.customer-claims-count-card small {
+  display: block;
+  color: #6b7280;
+}
+
+.customer-claims-count-card h3 {
+  margin: 4px 0 0;
+  color: #1f2937;
+  font-size: 30px;
+}
+
+.customer-claims-section-card {
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+}
+
+.customer-claims-table {
+  min-width: 950px;
+  margin: 0;
+}
+
+.customer-claims-table thead th {
+  padding: 14px 16px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.customer-claims-table tbody td {
+  padding: 15px 16px;
+  color: #334155;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.customer-claim-amount {
+  color: #d97706 !important;
+  font-weight: 700;
+}
+
+.customer-claim-reason {
+  min-width: 220px;
+  max-width: 320px;
+  white-space: normal !important;
+}
+
+.customer-claim-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.customer-claim-status-approved {
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+}
+
+.customer-claim-status-pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+}
+
+.customer-claim-status-rejected {
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.customer-claims-empty-state {
+  padding: 45px 20px !important;
+  color: #64748b !important;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .customer-claims-count-card {
+    width: 100%;
+  }
+
+  .customer-claims-section-card {
+    padding: 18px;
+  }
+}
